@@ -1,240 +1,264 @@
+//create Database
+// use e_learningDB
 
-// LEVEL 1 – SINGLE ACCOUNT
+//create user collection
+db.createCollection("users",{
+    validator:{
+        $jsonSchema:{
+            bsonType:"object",
+            required:["name","email","password","role"],
+            properties:{
+                name:{bsonType:"string"},
+                email:{bsonType:"string"},
+                password:{bsonType:"string"},
+                role:{enum:["student","instructor"]},
+                isVerified:{bsonType:"bool"},
+                createdAt:{bsonType:"date"}
+            }
+        }
+    }
+})
 
 
-const account = {
-  accountNumber: 1001,
-  name: "Vishal",
-  balance: 5000,
-  transactions: []
-};
+db.users.createIndex({ email: 1 }, { unique: true })
+
+db.users.insertMany([
+  { _id: 1, name: "Vishal", email: "vishal@web.com", password: "pass", role: "instructor", isVerified: true, createdAt: new Date() },
+  { _id: 2, name: "Vishnu", email: "vishnu@web.com", password: "pass", role: "instructor", isVerified: true, createdAt: new Date() },
+  { _id: 3, name: "Monish", email: "monish@web.com", password: "pass", role: "instructor", isVerified: true, createdAt: new Date() },
+
+  { _id: 4, name: "Yuva", email: "yuva@ds.com", password: "pass", role: "instructor", isVerified: true, createdAt: new Date() },
+  { _id: 5, name: "Sabinth", email: "sabinth@ds.com", password: "pass", role: "instructor", isVerified: true, createdAt: new Date() },
+  { _id: 6, name: "Jayanth", email: "jayanth@ds.com", password: "pass", role: "instructor", isVerified: true, createdAt: new Date() },
+
+  { _id: 7, name: "Vikram", email: "vikram@cyber.com", password: "pass", role: "instructor", isVerified: true, createdAt: new Date() },
+  { _id: 8, name: "Sneha", email: "sneha@cyber.com", password: "pass", role: "instructor", isVerified: true, createdAt: new Date() },
+  { _id: 9, name: "Rohit", email: "rohit@cyber.com", password: "pass", role: "instructor", isVerified: true, createdAt: new Date() }
+])
 
 
-function deposit(acc, amount) {
-  if (amount <= 0) {
-    console.log("Deposit amount must be greater than 0");
-    return;
+
+for (let i = 10; i < 20; i++) {
+  db.users.insertOne({
+    _id: i,
+    name: "Student" + (i - 9),
+    email: "student" + (i - 9) + "@gmail.com",
+    password: "pass",
+    role: "student",
+    isVerified: true,
+    createdAt: new Date()
+  })
+}
+
+
+
+//create course collection
+
+db.createCollection("courses",{
+    validator:{
+        $jsonSchema:{
+            bsonType:"object",
+            required:["title","price","instructorId"],
+            properties:{
+                title:{bsonType:"string"},
+                description:{bsonType:"string"},
+                price:{bsonType:"number"},
+                instructorId:{bsonType:"objectId"},
+                categoryId:{bsonType:"objectId"},
+                rating:{bsonType:"number"},
+                totalStudents:{bsonType:"int"},
+                level:{enum:["beginner","intermediate","advanced"]
+
+                }
+
+            }
+        }
+    }
+})
+
+
+db.courses.insertMany([
+  { _id: 1, title: "MERN Bootcamp", price: 5000, instructorId: 1, categoryId: 1, rating: 4.5, totalStudents: 0, level: "beginner" },
+  { _id: 2, title: "Advanced React", price: 4000, instructorId: 2, categoryId: 1, rating: 4.7, totalStudents: 0, level: "advanced" },
+
+  { _id: 3, title: "Python for Data Science", price: 4500, instructorId: 4, categoryId: 2, rating: 4.8, totalStudents: 0, level: "beginner" },
+  { _id: 4, title: "Machine Learning", price: 6000, instructorId: 5, categoryId: 2, rating: 4.9, totalStudents: 0, level: "advanced" },
+
+  { _id: 5, title: "Ethical Hacking", price: 5500, instructorId: 7, categoryId: 3, rating: 4.6, totalStudents: 0, level: "intermediate" },
+  { _id: 6, title: "Network Security", price: 5000, instructorId: 8, categoryId: 3, rating: 4.4, totalStudents: 0, level: "beginner" }
+])
+
+
+
+
+//create lessons collection
+
+db.createCollection("lessons",{
+    validator:{
+        bsonType:"object",
+        required:["courseId","title"],
+        properties:{
+            courseId:{bsonType:"objectId"},
+            title:{bsonType:"string"},
+            videoUrl:{bsonType:"string"},
+            duration:{bsonType:"number"},
+            order:{bsonType:"int"}
+        }
+    }
+})
+
+
+db.createCollection("lessons")
+
+db.lessons.insertMany([
+  { _id: 1, courseId: 1, title: "Intro to MERN", duration: 20, order: 1 },
+  { _id: 2, courseId: 1, title: "MongoDB Basics", duration: 25, order: 2 },
+  { _id: 3, courseId: 3, title: "Python Basics", duration: 30, order: 1 }
+])
+
+
+
+
+//create entrollments collection
+
+db.createCollection("entrollments")
+
+db.entrollments.createIndex(
+    {courseId: 1, studentId: 1},
+    {unique: true}
+)
+
+db.createCollection("enrollments")
+
+db.enrollments.insertMany([
+  { _id: 1, studentId: 10, courseId: 1, enrolledAt: new Date(), paymentId: 1 },
+  { _id: 2, studentId: 11, courseId: 3, enrolledAt: new Date(), paymentId: 2 }
+])
+
+
+//create reviw collection
+
+db.createCollection("reviews",{
+    validator:{
+        $jsonSchema:{
+            bsonType:"object",
+            required:["courseId","studentId","rating"],
+            properties:{
+                rating:{
+                    bsonType:"int",
+                    minimum:1,
+                    maximum:5
+                }
+            }
+        }
+    }
+})
+
+
+db.createCollection("reviews")
+
+db.reviews.insertMany([
+  { _id: 1, courseId: 1, studentId: 10, rating: 5, comment: "Excellent!", createdAt: new Date() },
+  { _id: 2, courseId: 3, studentId: 11, rating: 4, comment: "Very Good", createdAt: new Date() }
+])
+
+
+//create category collection
+
+db.createCollection("categories")
+
+db.categories.insertMany([
+  { _id: 1, name: "Web Development" },
+  { _id: 2, name: "Data Science" },
+  { _id: 3, name: "Cyber Security" }
+])
+
+
+//create payment collection
+
+db.createCollection("payments")
+
+
+db.createCollection("payments")
+
+db.payments.insertMany([
+  { _id: 1, studentId: 10, courseId: 1, amount: 5000, paymentStatus: "completed", transactionId: "TXN001", createdAt: new Date() },
+  { _id: 2, studentId: 11, courseId: 3, amount: 4500, paymentStatus: "completed", transactionId: "TXN002", createdAt: new Date() }
+])
+
+
+
+//phase 2
+
+db.courses.aggregate([
+  { $sort: { rating: -1 } },
+  { $limit: 3 },
+  {
+    $project: {
+      _id: 1,
+      title: 1,
+      rating: 1,
+      price: 1
+    }
   }
-
-  acc.balance += amount;
-  acc.transactions.push(`Deposited ₹${amount}`);
-  console.log(`Deposited ₹${amount}`);
-}
+])
 
 
-function withdraw(acc, amount) {
-  if (amount <= 0) {
-    console.log("Withdrawal must be greater than 0");
-    return;
+db.payments.aggregate([
+  {
+    $group: {
+      _id: "$courseId",
+      totalRevenue: { $sum: "$amount" }
+    }
+  },
+  {
+    $lookup: {
+      from: "courses",
+      localField: "_id",
+      foreignField: "_id",
+      as: "courseDetails"
+    }
   }
+])
 
-  if (amount > acc.balance) {
-    console.log(" Insufficient balance");
-    return;
+
+db.courses.aggregate([
+  {
+    $lookup: {
+      from: "payments",
+      localField: "_id",
+      foreignField: "courseId",
+      as: "payments"
+    }
+  },
+  {
+    $unwind: "$payments"
+  },
+  {
+    $group: {
+      _id: "$instructorId",
+      totalEarnings: { $sum: "$payments.amount" }
+    }
+  },
+  {
+    $lookup: {
+      from: "users",
+      localField: "_id",
+      foreignField: "_id",
+      as: "instructorDetails"
+    }
   }
-
-  acc.balance -= amount;
-  acc.transactions.push(`Withdrawn ₹${amount}`);
-  console.log(`Withdrawn ₹${amount}`);
-}
-
-
-function checkBalance(acc) {
-  console.log(`Current Balance: ₹${acc.balance}`);
-}
-
-console.log("LEVEL 1 TEST ");
-
-deposit(account, 2000);
-withdraw(account, 1000);
-checkBalance(account);
-
-console.log("Transactions:", account.transactions);
-
-
-
-
-
-
-
-
-// LEVEL 2 – MULTI ACCOUNT BANK
-
-
-const bank = {
-  bankName: "Vishal Bank",
-  accounts: [],
-  nextAccountNumber: 2001
-};
-
-function createAccount(name, initialBalance) {
-  const newAccount = {
-    accountNumber: bank.nextAccountNumber++,
-    name,
-    balance: initialBalance,
-    transactions: []
-  };
-
-  bank.accounts.push(newAccount);
-  console.log(`Account created for ${name} (Acc No: ${newAccount.accountNumber})`);
-  return newAccount;
-}
-
-function findAccount(accountNumber) {
-  return bank.accounts.find(acc => acc.accountNumber === accountNumber);
-}
-
-
-function bankDeposit(accountNumber, amount) {
-  const acc = findAccount(accountNumber);
-
-  if (!acc) {
-    console.log("Account not found");
-    return;
-  }
-
-  deposit(acc, amount);
-}
-
-function bankWithdraw(accountNumber, amount) {
-  const acc = findAccount(accountNumber);
-
-  if (!acc) {
-    console.log(" Account not found");
-    return;
-  }
-
-  withdraw(acc, amount);
-}
-
-
-function transfer(fromAccNo, toAccNo, amount) {
-  const sender = findAccount(fromAccNo);
-  const receiver = findAccount(toAccNo);
-
-  if (!sender || !receiver) {
-    console.log(" One or both accounts not found");
-    return;
-  }
-
-  if (amount > sender.balance) {
-    console.log("Insufficient balance for transfer");
-    return;
-  }
-
-  sender.balance -= amount;
-  receiver.balance += amount;
-
-  sender.transactions.push(`Transferred ₹${amount} to ${toAccNo}`);
-  receiver.transactions.push(`Received ₹${amount} from ${fromAccNo}`);
-
-  console.log(`Transfer successful: ₹${amount}`);
-}
-
-function showAllAccounts() {
-  console.log("\n All Bank Accounts:");
-  bank.accounts.forEach(acc => {
-    console.log(`Acc No: ${acc.accountNumber} | Name: ${acc.name} | Balance: ₹${acc.balance}`);
-  });
-}
-
-console.log("\n LEVEL 2 TEST ");
-
-const acc1 = createAccount("Arun", 10000);
-const acc2 = createAccount("Priya", 8000);
-
-bankDeposit(acc1.accountNumber, 2000);
-bankWithdraw(acc2.accountNumber, 1000);
-transfer(acc1.accountNumber, acc2.accountNumber, 3000);
-
-showAllAccounts();
-
-
-
-// LEVEL 3
-
-
-function createAccount(name, initialBalance, type) {
-  if (type === "savings" && initialBalance < 1000) {
-    console.log(" Savings account requires minimum ₹1000");
-    return;
-  }
-
-  const newAccount = {
-    accountNumber: bank.nextAccountNumber++,
-    name,
-    balance: initialBalance,
-    type,
-    loan: 0,
-    transactions: []
-  };
-
-  bank.accounts.push(newAccount);
-  console.log(` ${type.toUpperCase()} account created for ${name}`);
-  return newAccount;
-}
-
-
-function applyInterest(accountNumber) {
-  const acc = findAccount(accountNumber);
-
-  if (!acc) return console.log(" Account not found");
-
-  if (acc.type !== "savings") {
-    console.log(" Interest only for savings accounts");
-    return;
-  }
-
-  const interest = acc.balance * 0.04;
-  acc.balance += interest;
-  acc.transactions.push(`Interest added ₹${interest}`);
-
-  console.log(` Interest ₹${interest} added`);
-}
-
-
-function takeLoan(accountNumber, amount) {
-  const acc = findAccount(accountNumber);
-
-  if (!acc) return console.log(" Account not found");
-
-  const maxLoan = acc.balance * 5;
-
-  if (amount > maxLoan) {
-    console.log(" Loan exceeds limit");
-    return;
-  }
-
-  acc.loan += amount;
-  acc.balance += amount;
-  acc.transactions.push(`Loan taken ₹${amount}`);
-
-  console.log(` Loan approved ₹${amount}`);
-}
-
-
-function bankSummary() {
-  let totalBalance = 0;
-  let totalLoans = 0;
-
-  bank.accounts.forEach(acc => {
-    totalBalance += acc.balance;
-    totalLoans += acc.loan;
-  });
-
-  console.log("\nBank Summary");
-  console.log("Total Bank Balance:", totalBalance);
-  console.log("Total Loans Given:", totalLoans);
-}
-
-
-console.log("\n LEVEL 3 TEST ");
-
-const acc3 = createAccount("Ravi", 5000, "savings");
-const acc4 = createAccount("Meena", 3000, "current");
-
-applyInterest(acc3.accountNumber);
-takeLoan(acc3.accountNumber, 10000);
-
-bankSummary();
-
+])
+
+
+
+db.payments.aggregate([
+  {
+    $group: {
+        
+      _id: { month: { $month: "$createdAt" } },
+      monthlyRevenue: { $sum: "$amount" }
+    }
+  },
+  { $sort: { "_id.month": 1 } }
+])
